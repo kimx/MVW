@@ -1,0 +1,216 @@
+﻿<div class="row" ng-init="vm.Init();">
+    <div class="col-sm-12">
+        <div class="callout callout-info" style="background-color:#fff !important;color:gray !important">
+          
+            <form class="form-inline">
+                <div class="form-group form-group-sm">
+                    <label>New words : </label>                </div>
+                <div class="form-group form-group-sm">
+                    <input type="text" id="txtAddFromWord" ng-model="vm.Main.FromWord" class="form-control" placeholder="From Word" />
+                </div>
+                <div class="form-group form-group-sm">
+                    <input type="text" ng-model="vm.Main.ToWord" class="form-control" placeholder="To Word" />
+
+                </div>
+                <button type="submit" class="btn btn-primary btn-group btn-sm" ng-click="vm.Add();"><span class="fa fa-plus"></span> Add</button>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="blockWrap" style="overflow-x:scroll;height:300px;overflow-y:auto;">
+    <table>
+        <tr style="vertical-align:top">
+            <td>
+                <div class="block">
+                    <h4><span class="fa fa-align-center"></span> New</h4>
+                    @RenderBlock("bg-aqua-gradient", 0)
+                </div>
+            </td>
+            <td>
+                <div class="block">
+                    <h4><span class="fa fa-align-left"></span> Second</h4>
+                    @RenderBlock("bg-light-blue-gradient", 1)
+                </div>
+            </td>
+            <td>
+                <div class="block">
+                    <h4><span class="fa fa-align-justify"></span> Third</h4>
+                    @RenderBlock("bg-blue-gradient", 2)
+                </div>
+            </td>
+            <td>
+                <div class="block">
+                    <h4><span class="fa fa-list "></span> Fourth</h4>
+                    @RenderBlock("bg-purple-gradient", 3)
+                </div>
+            </td>
+            <td>
+                <div class="block">
+                    <h4><span class="fa fa-list-alt"></span> Final Review</h4>
+                    @RenderBlock("bg-yellow-gradient", 4, true)
+                </div>
+            </td>
+            <td>
+                <div class="block">
+                    <h4><span class="fa fa-check-square"></span> Recently Closed within 7 days</h4>
+                    @RenderBlock("bg-green-gradient", 4, false, true)
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+@helper RenderBlock(string theme, int knowTimes, bool isFinal = false, bool isClose = false)
+{
+    var listName = "vm.List";
+    if (isClose)
+    {
+        listName = "vm.ClosedList";
+    }
+
+    <div ng-repeat="item in @listName | filter:{KnowTimes:@knowTimes}"
+         class="small-box @theme" style="border-radius:6px;box-shadow:0 0 5px rgba(0, 0, 0, 0.5)">
+        <div class="inner" ng-show="!item.MoreInfo">
+            @if (!isClose)
+            {
+                <h4 ng-if="!item.ShowToWord">
+                    <a href="javascript://" style="color:white" ng-click="vm.ToggleShow(item,$event);"><span class="fa fa-edit"></span> {{item.FromWord}}</a>
+
+                </h4>
+                <div ng-if="item.ShowToWord" class="input-group-sm">
+                    <input id="txtEditFromWord" ng-keydown="vm.Update($event,item);" type="text" class="form-control" ng-model="item.FromWord" />
+                    <input ng-keydown="vm.Update($event,item);" type="text" class="form-control" ng-model="item.ToWord" />
+                    <button ng-click="vm.Delete(item);" class="btn btn-default btn-xs "><span class="fa fa-remove"></span> Delete</button>
+
+                </div>
+                <div style="padding-top:10px">
+                    <button ng-click="vm.DeCreaseTimes(item);" ng-disabled="item.KnowTimes==0" type="button" class="btn btn-social-icon btn-google-plus"><span class="fa fa-thumbs-down"></span></button>
+                    <button ng-click="vm.Translate(item);" type="button" class="btn btn-default btn-xs"><span class="fa fa-google"></span></button>
+                    <button ng-click="vm.TranslateByYahoo(item);" type="button" class="btn btn-default btn-xs"><span class="fa fa-yahoo"></span></button>
+                    <button ng-show="!item.Star" ng-click="vm.Star(item);" type="button" class="btn btn-default btn-xs "><span class="fa fa-star-o text-yellow"></span></button>
+                    <button ng-show="item.Star" ng-click="vm.UnStar(item);" type="button" class="btn btn-default btn-xs "><span class="fa fa-star text-yellow"></span></button>
+
+
+                    <div class="btn-group pull-right">
+                        @if (isFinal)
+                        {
+                            <button ng-click="vm.Closed(item);" type="button" class="btn btn-social-icon bg-green-gradient pull-right "><span class="fa fa-check"></span></button>
+
+                        }
+                        else
+                        {
+
+                            <button ng-click="vm.InCreaseTimes(item);" type="button" class="btn btn-social-icon btn-dropbox " data-toggle="dropdown"><span class="fa fa-thumbs-up"></span></button>
+                            @*<button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li ng-click="vm.Delete(item);"><a>Delete</a></li>
+
+                                </ul>*@
+
+                        }
+
+
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h4 ng-if="!item.ShowToWord">
+                    <a class="icon fa fa-check "></a>
+                    <span>{{item.FromWord}}</span>
+                </h4>
+                <button ng-click="vm.Translate(item);" type="button" class="btn btn-default btn-xs"><span class="fa fa-google"></span></button>
+                <button ng-show="!item.Star" ng-click="vm.Star(item);" type="button" class="btn btn-default btn-xs "><span class="fa fa-star-o text-yellow"></span></button>
+                <button ng-show="item.Star" ng-click="vm.UnStar(item);" type="button" class="btn btn-default btn-xs "><span class="fa fa-star text-yellow"></span></button>
+
+            }
+        </div>
+        <div class="inner" ng-show="item.MoreInfo" ng-mouseleave="item.MoreInfo=false">
+            <h3>{{item.FromWord}}</h3>
+            <h4>{{item.ToWord}}</h4>
+            <i title="Create by" class="xs"><span class="fa fa-clock-o"></span> {{item.CreateUtc | date:'yyyy/MM/dd HH:mm:ss'}} </i>
+
+            <p>
+                <i title="Modify by"><span class="fa fa-clock-o fa-rotate-90"></span> {{item.ModifyUtc  | date:'yyyy/MM/dd HH:mm:ss'}}</i>
+            </p>
+        </div>
+        @*<div class="icon">
+                <i class="fa fa-shopping-cart"></i>
+            </div>*@
+        <div class="small-box-footer" style="cursor:pointer" ng-click="item.MoreInfo=true" ng-show="!item.MoreInfo">
+            More info <i class="fa fa-arrow-circle-right"></i>
+        </div>
+
+    </div>
+
+    @*<div class="box-header with-border">
+            <h3 class="box-title">@title</h3>
+        </div>
+        <div class="box-body">
+            <div ng-repeat="item in @listName | filter:{KnowTimes:@knowTimes}" class="alert alert-info alert-dismissable">
+                @if (!isClose)
+                {
+                    <h4 ng-if="!item.ShowToWord">
+                        <a class="icon fa fa-book "></a>
+                        <a href="javascript://" ng-click="vm.ToggleShow(item);">{{item.FromWord}}</a>
+                        <div class=" pull-right">
+
+                            <button ng-click="vm.Translate(item);" type="button" class="btn btn-default btn-xs"><span class="fa fa-google"></span></button>
+                            <button ng-show="!item.Star" ng-click="vm.Star(item);" type="button" class="btn btn-default btn-xs "><span class="fa fa-star-o text-yellow"></span></button>
+                            <button ng-show="item.Star" ng-click="vm.UnStar(item);" type="button" class="btn btn-default btn-xs "><span class="fa fa-star text-yellow"></span></button>
+
+                        </div>
+                    </h4>
+                    <div ng-if="item.ShowToWord" class="input-group-sm">
+                        <input ng-keydown="vm.Update($event,item);" type="text" class="form-control" ng-model="item.FromWord" />
+                        <input ng-keydown="vm.Update($event,item);" type="text" class="form-control" ng-model="item.ToWord" />
+                    </div>
+                    <div style="padding-top:10px">
+                        <button ng-click="vm.DeCreaseTimes(item);" ng-disabled="item.KnowTimes==0" type="button" class="btn btn-warning btn-xs  "><span class="fa fa-thumbs-down"></span></button>
+
+                        <div class="btn-group pull-right">
+                            @if (isFinal)
+                            {
+                                <button ng-click="vm.Closed(item);" type="button" class="btn btn-success btn-xs pull-right "><span class="fa fa-check"></span></button>
+
+                            }
+                            else
+                            {
+                                <button ng-click="vm.InCreaseTimes(item);" type="button" class="btn btn-primary btn-xs  " data-toggle="dropdown"><span class="fa fa-thumbs-up"></span></button>
+
+                                <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li ng-click="vm.Delete(item);"><a>Delete</a></li>
+
+                                </ul>
+
+                            }
+
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h4 ng-if="!item.ShowToWord">
+                        <a class="icon fa fa-check "></a>
+                        <span>{{item.FromWord}}</span>
+                        <button ng-click="vm.Translate(item);" type="button" class="btn btn-default btn-xs pull-right"><span class="fa fa-google"></span></button>
+                    </h4>
+
+                }
+
+            </div>
+        </div>*@
+
+}
