@@ -31,9 +31,7 @@ var MVW;
                 else
                     item.ShowToWord = true;
                 console.log($($event.currentTarget).next("input").length);
-                setTimeout(function () {
-                    $("#txtEditFromWord").focus();
-                }, 100);
+                setTimeout(function () { $("#txtEditFromWord").focus(); }, 100);
             };
             WordController.prototype.Add = function () {
                 var _this = this;

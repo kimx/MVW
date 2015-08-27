@@ -72,7 +72,7 @@
         listName = "vm.ClosedList";
     }
 
-    <div ng-repeat="item in @listName | filter:{KnowTimes:@knowTimes}"
+    <div ng-repeat="item in @listName | filter:{KnowTimes:@knowTimes} track by item.Id"
          class="small-box @theme" style="border-radius:6px;box-shadow:0 0 5px rgba(0, 0, 0, 0.5)">
         <div class="inner" ng-show="!item.MoreInfo">
             @if (!isClose)
