@@ -24,7 +24,7 @@ namespace MVW.WebApp.API
 
         public IQueryable<WordEntity> GetClosedWordByLastDays(int days)
         {
-            DateTime closeDate = DateTime.Now.AddDays(days * -1);
+            DateTime closeDate = DateTime.UtcNow.AddDays(days * -1);
             return db.Word.Where(o => o.Closed && o.CloseUtc > closeDate).OrderByDescending(o => o.ModifyUtc);
         }
 
@@ -55,9 +55,9 @@ namespace MVW.WebApp.API
                 return BadRequest();
             }
             if (wordEntity.Closed)
-                wordEntity.CloseUtc = DateTime.Now;
+                wordEntity.CloseUtc = DateTime.UtcNow;
             else
-                wordEntity.ModifyUtc = DateTime.Now;
+                wordEntity.ModifyUtc = DateTime.UtcNow;
             db.Entry(wordEntity).State = EntityState.Modified;
 
             try
@@ -87,8 +87,8 @@ namespace MVW.WebApp.API
             {
                 return BadRequest(ModelState);
             }
-            wordEntity.CreateUtc = DateTime.Now;
-            wordEntity.ModifyUtc = DateTime.Now;
+            wordEntity.CreateUtc = DateTime.UtcNow;
+            wordEntity.ModifyUtc = DateTime.UtcNow;
             wordEntity.CreateUser = "Kim";
             db.Word.Add(wordEntity);
             db.SaveChanges();
