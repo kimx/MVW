@@ -98,7 +98,7 @@ var MVW;
                 });
             };
             return WordController;
-        })();
+        }());
         Controller.WordController = WordController;
     })(Controller = MVW.Controller || (MVW.Controller = {}));
 })(MVW || (MVW = {}));

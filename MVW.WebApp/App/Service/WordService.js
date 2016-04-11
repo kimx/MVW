@@ -34,7 +34,7 @@ var MVW;
                 });
             };
             return WordService;
-        })();
+        }());
         Service.WordService = WordService;
     })(Service = MVW.Service || (MVW.Service = {}));
 })(MVW || (MVW = {}));

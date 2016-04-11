@@ -14,25 +14,35 @@ namespace MVW.WebApp.API
 {
     public class WordEntitiesController : ApiController
     {
-        private MVWDataBase db = new MVWDataBase();
+        //private MVWDataBase db = new MVWDataBase();
 
-        // GET: api/WordEntities
-        public IQueryable<WordEntity> GetWord()
+        private MVWJsonDataBase jsonDb;
+        public WordEntitiesController()
         {
-            return db.Word.Where(o => o.Closed == false).OrderByDescending(o => o.ModifyUtc);
+            jsonDb = MvcApplication.jsonDb;
+
         }
 
-        public IQueryable<WordEntity> GetClosedWordByLastDays(int days)
+        // GET: api/WordEntities
+        public IEnumerable<WordEntity> GetWord()
+        {
+            return jsonDb.Word.Where(o => o.Closed == false).OrderByDescending(o => o.ModifyUtc);
+            //return db.Word.Where(o => o.Closed == false).OrderByDescending(o => o.ModifyUtc);
+        }
+
+        public IEnumerable<WordEntity> GetClosedWordByLastDays(int days)
         {
             DateTime closeDate = DateTime.UtcNow.AddDays(days * -1);
-            return db.Word.Where(o => o.Closed && o.CloseUtc > closeDate).OrderByDescending(o => o.ModifyUtc);
+            return jsonDb.Word.Where(o => o.Closed && o.CloseUtc > closeDate).OrderByDescending(o => o.ModifyUtc);
+            // return db.Word.Where(o => o.Closed && o.CloseUtc > closeDate).OrderByDescending(o => o.ModifyUtc);
         }
 
         // GET: api/WordEntities/5
         [ResponseType(typeof(WordEntity))]
         public IHttpActionResult GetWordEntity(int id)
         {
-            WordEntity wordEntity = db.Word.Find(id);
+            WordEntity wordEntity = jsonDb.Word.Single(o => o.Id == id);
+            // WordEntity wordEntity = db.Word.Find(id);
             if (wordEntity == null)
             {
                 return NotFound();
@@ -58,23 +68,13 @@ namespace MVW.WebApp.API
                 wordEntity.CloseUtc = DateTime.UtcNow;
             else
                 wordEntity.ModifyUtc = DateTime.UtcNow;
-            db.Entry(wordEntity).State = EntityState.Modified;
+            //db.Entry(wordEntity).State = EntityState.Modified;
+            var oldEntity = jsonDb.Word.Single(o => o.Id == id);
+            oldEntity.KnowTimes = wordEntity.KnowTimes;
+            oldEntity.FromWord = wordEntity.FromWord;
+            oldEntity.ToWord = wordEntity.ToWord;
 
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WordEntityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            jsonDb.SaveChanges();
 
             return StatusCode(HttpStatusCode.NoContent);
         }
@@ -90,8 +90,9 @@ namespace MVW.WebApp.API
             wordEntity.CreateUtc = DateTime.UtcNow;
             wordEntity.ModifyUtc = DateTime.UtcNow;
             wordEntity.CreateUser = "Kim";
-            db.Word.Add(wordEntity);
-            db.SaveChanges();
+            wordEntity.Id = jsonDb.Word.Max(o => o.Id) + 1;
+            jsonDb.Word.Add(wordEntity);
+            jsonDb.SaveChanges();
 
             return CreatedAtRoute("DefaultApi", new { id = wordEntity.Id }, wordEntity);
         }
@@ -100,30 +101,17 @@ namespace MVW.WebApp.API
         [ResponseType(typeof(WordEntity))]
         public IHttpActionResult DeleteWordEntity(int id)
         {
-            WordEntity wordEntity = db.Word.Find(id);
+            WordEntity wordEntity = jsonDb.Word.Single(o => o.Id == id);
             if (wordEntity == null)
             {
                 return NotFound();
             }
 
-            db.Word.Remove(wordEntity);
-            db.SaveChanges();
+            jsonDb.Word.Remove(wordEntity);
+            jsonDb.SaveChanges();
 
             return Ok(wordEntity);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        private bool WordEntityExists(int id)
-        {
-            return db.Word.Count(e => e.Id == id) > 0;
-        }
     }
 }

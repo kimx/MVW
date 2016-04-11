@@ -13,7 +13,7 @@ var MVW;
                 .otherwise({ redirectTo: "/" });
         };
         return App;
-    })();
+    }());
     MVW.App = App;
 })(MVW || (MVW = {}));
 //# sourceMappingURL=App.js.map
