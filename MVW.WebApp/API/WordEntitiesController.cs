@@ -73,7 +73,9 @@ namespace MVW.WebApp.API
             oldEntity.KnowTimes = wordEntity.KnowTimes;
             oldEntity.FromWord = wordEntity.FromWord;
             oldEntity.ToWord = wordEntity.ToWord;
-
+            oldEntity.CloseUtc = wordEntity.CloseUtc;
+            oldEntity.ModifyUtc = wordEntity.ModifyUtc;
+            oldEntity.Closed = wordEntity.Closed;
             jsonDb.SaveChanges();
 
             return StatusCode(HttpStatusCode.NoContent);
